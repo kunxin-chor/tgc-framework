@@ -25,7 +25,10 @@ var bootstrapField = function (name, object) {
     return '<div class="form-group">' + label + widget + error + '</div>';
 };
 
-const createProductForm = () => {
+// pass in an array of categories
+// the categories must be an array of array
+// each inner array has two elements - first: key, second: value
+const createProductForm = (categories) => {
     // creates a form object
     // the key will the value of the `name` attribute
     return forms.create({
@@ -41,6 +44,13 @@ const createProductForm = () => {
         'description':fields.string({
             required: true,
             errorAfterField: true
+        }),
+        'category_id': fields.string({
+            label: 'Category',
+            required: true,
+            errorAfterField: true,
+            widget: widgets.select(),
+            choices:categories
         })
     })
 }
