@@ -19,6 +19,10 @@ const Product = bookshelf.model('Product',{
         // the NAME of the MODEL is the one paraemter in `bookshelf.model`
         // one instance (row) of product belongs to one instance (row) in the categories table
         return this.belongsTo('Category')
+    },
+    // the name of the relationship is 'tags'
+    tags() {
+        return this.belongsToMany('Tag');
     }
 });
 
@@ -33,4 +37,11 @@ const Category = bookshelf.model('Category',{
     }
 })
 
-module.exports = { Product, Category };
+const Tag = bookshelf.model('Tag',{
+    tableName: 'tags',
+    products() {
+        return this.belongsToMany('Product')
+    }
+})
+
+module.exports = { Product, Category, Tag };

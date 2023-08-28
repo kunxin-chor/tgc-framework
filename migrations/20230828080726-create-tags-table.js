@@ -15,12 +15,23 @@ exports.setup = function(options, seedLink) {
 };
 
 exports.up = function(db) {
-  // the default brand will have ID 1
-  return db.insert('brands', ['name'], ['Default']);
+  return db.createTable('tags',{
+    id:{
+      type:'int',
+      unsigned: true,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    name:{
+      type:'string',
+      length:100,
+      notNull:true
+    }
+  });
 };
 
 exports.down = function(db) {
-  return db.run("DELETE FROM brands WHERE name = 'Default");
+  return db.dropTable('tags')
 };
 
 exports._meta = {

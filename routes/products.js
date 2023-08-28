@@ -1,5 +1,5 @@
 const express = require('express');
-const { Product, Category } = require('../models');
+const { Product, Category, Tag } = require('../models');
 const { createProductForm, bootstrapField } = require('../forms');
 const async = require('hbs/lib/async');
 const router = express.Router();
@@ -22,10 +22,13 @@ router.get('/', async (req,res)=>{
 
 router.get('/add-product', async (req,res)=>{
 
-    // fetch all possible categories from the databasae
+    // fetch all possible categories from the database
     const allCategories = await Category.fetchAll().map( c => [c.get('id'), c.get('name')]);
 
-    const form = createProductForm(allCategories);
+    // fetch all possible tags from the database
+    const allTags = await Tag.fetchAll().map( t => [t.get('id'), t.get('name')])
+
+    const form = createProductForm(allCategories, allTags);
     res.render('products/create',{
         form: form.toHTML(bootstrapField)
     })
@@ -36,7 +39,11 @@ router.post('/add-product', async (req,res)=>{
     // fetch all possible categories from the databasae
     const allCategories = await Category.fetchAll().map( c => [c.get('id'), c.get('name')]);
     
-    const form = createProductForm(allCategories);
+     // fetch all possible tags from the database
+     const allTags = await Tag.fetchAll().map( t => [t.get('id'), t.get('name')])
+
+
+    const form = createProductForm(allCategories, allTags);
     form.handle(req, {
         "success":async (form)=>{
             // no error in the form
@@ -54,6 +61,14 @@ router.post('/add-product', async (req,res)=>{
             product.set('description', form.data.description);
             product.set('category_id', form.data.category_id);
             await product.save();
+
+              // save to pivot table (AFTER THE PRODUCT HAS BEEN CREATED)
+              if (form.data.tags) {
+                // if the user selects at least one tag then we associate
+                // those tags with the product
+                await product.tags().attach(form.data.tags.split(','));
+            }
+
             res.redirect('/products');
         
         },
@@ -78,17 +93,26 @@ router.get('/:product_id/update', async (req,res)=>{
     const product = await Product.where({
         'id': productId
     }).fetch({
-        require: true
-    });
+        require: true,
+        withRelated:['tags'] // fetch all the associated tags information
+     });
 
      // fetch all possible categories from the databasae
      const allCategories = await Category.fetchAll().map( c => [c.get('id'), c.get('name')]);
 
-    const form = createProductForm(allCategories);
+     // fetch all possible tags from the database
+     const allTags = await Tag.fetchAll().map( t => [t.get('id'), t.get('name')])
+
+
+    const form = createProductForm(allCategories, allTags);
     form.fields.name.value = product.get('name');
     form.fields.cost.value = product.get('cost');
     form.fields.description.value = product.get('description');
     form.fields.category_id.value = product.get('category_id');
+
+    // we need to get all the id of the tags that the product is associated with
+    const selectedTags = await product.related('tags').pluck('id');
+    form.fields.tags.value = selectedTags;
 
     res.render('products/update', {
         form: form.toHTML(bootstrapField)
@@ -104,7 +128,8 @@ router.post('/:product_id/update', async(req,res)=>{
     const product = await Product.where({
         'id': req.params.product_id
     }).fetch({
-        require: true
+        require: true,
+        withRelated:['tags']
     });
 
     form.handle(req, {
@@ -113,8 +138,19 @@ router.post('/:product_id/update', async(req,res)=>{
             // by giving it an object
             // so each key in form.data will be updated into the row
             // for this to work, all the object's keys must match a column in the row
-            product.set(form.data);
+            
+            let {tags, ...productData} = form.data
+            product.set(productData); 
             await product.save();
+
+            // sync the tags
+            // get all the existing tags
+            const existingTags = await product.related('tags').pluck('id');
+            // remove all the existing tags
+            await product.tags().detach(existingTags);
+            // add the tags that are selected in the form
+            await product.tags().attach(form.data.tags.split(','))
+
             res.redirect('/products');
         },
         'error': async (form)=>{
