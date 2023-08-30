@@ -48,23 +48,23 @@ app.use(function(req,res,next){
   next();
 })
 
+// custom middleware to show the current logged in user
+app.use(function(req,res,next){
+  if (req.session.user) {
+    res.locals.user = req.session.user;
+  }
+
+  next();
+})
+
 const landingRoutes = require('./routes/landing');
 const productRoutes = require('./routes/products');
+const userRoutes = require('./routes/users');
+
 async function main() {
 
-// Example route
-//   app.get('/', function(req,res){
-//     // when we do res.render, it will by default
-//     // look for the file in the `views` folder
-//     // and the .hbs extension is optional
-//     res.render('home.hbs', {
-//         "name":"Tan Ah Kow",
-//         "today_date":new Date()
-//     });
-//   })
 
-// register the landingRoutes router with express
-    
+    // register the landingRoutes router with express
     // for an URLS that begins with `/` only,
     // then use the landingRoutes router object
     app.use('/', landingRoutes);
@@ -72,6 +72,9 @@ async function main() {
     // for any URLS that begins with `/products`,
     // use the productRoutes router object
     app.use('/products', productRoutes);
+
+    // regiser the user routes
+    app.use('/users', userRoutes);
 }
 
 main();

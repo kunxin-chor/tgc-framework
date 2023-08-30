@@ -35,6 +35,12 @@
                         <a class="nav-link" href="/products">Products</a>
                     </li>
                 </ul>
+                <div>
+                    {{#if user}}
+                        Welcome back, <a href="/users/profile">{{user.name}}</a>
+                        <a href="/users/logout" class="btn btn-primary btn-sm">Logout</a>
+                    {{/if}}
+                </div>
             </div>
         </nav>
         <section>
@@ -49,7 +55,7 @@
             {{/if}}
 
             {{#if error_messages}}
-            <div class="alert alert-success">
+            <div class="alert alert-danger">
                 <ul>
                     {{#each error_messages}}
                     <li>{{this}}</li>
