@@ -6,6 +6,8 @@ const router = express.Router();
 
 
 router.get('/', async (req,res)=>{
+
+
     // fetching from the database is asynchronous operation
     const products = await Product.collection().fetch({
         withRelated:['category'] // also fetch the category of each product
@@ -69,6 +71,8 @@ router.post('/add-product', async (req,res)=>{
                 await product.tags().attach(form.data.tags.split(','));
             }
 
+            // a flash message is saved to the session data
+            req.flash("success", "New product has been created successfully!");
             res.redirect('/products');
         
         },

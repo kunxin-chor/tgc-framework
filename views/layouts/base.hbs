@@ -31,13 +31,34 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/contact-us">Contact Us</a>
                     </li>
-                          <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="/products">Products</a>
                     </li>
                 </ul>
             </div>
         </nav>
         <section>
+            {{#if success_messages}}
+            <div class="alert alert-success">
+                <ul>
+                    {{#each success_messages}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/if}}
+
+            {{#if error_messages}}
+            <div class="alert alert-success">
+                <ul>
+                    {{#each error_messages}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/if}}
+
+
             {{#block 'content'}}{{/block}}
         </section>
     </div>

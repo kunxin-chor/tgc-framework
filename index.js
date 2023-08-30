@@ -1,6 +1,9 @@
 const express = require("express");
 const hbs = require("hbs");
 const wax = require("wax-on");
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+const flash = require('connect-flash');
 require("dotenv").config();
 
 // create an instance of express app
@@ -12,6 +15,7 @@ app.set("view engine", "hbs");
 // static folder
 app.use(express.static("public"));
 
+
 // setup wax-on
 wax.on(hbs.handlebars);
 wax.setLayoutPath("./views/layouts");
@@ -22,6 +26,27 @@ app.use(
     extended: false
   })
 );
+
+// setup sessions
+app.use(session({
+  store: new FileStore(), // use files to store sessions
+  secret:"keyboard cat",
+  resave: false,
+  saveUninitialized: true // create a session if the request does not have one
+}));
+
+app.use(flash());
+
+// custom middleware to extract the flash messages
+app.use(function(req,res,next){
+  // extract out the success_messages
+  const successMessages = req.flash("success");
+  const errorMessages = req.flash("error");
+  // make the success_messages to all HBS files
+  res.locals.success_messages = successMessages; // <-- all hbs file use access
+  res.locals.error_messages = errorMessages;
+  next();
+})
 
 const landingRoutes = require('./routes/landing');
 const productRoutes = require('./routes/products');
