@@ -58,6 +58,9 @@ const createProductForm = (categories=[], tags=[]) => {
             errorAfterField: true,
             widget: widgets.multipleSelect(),
             choices: tags
+        }),
+        'image_url': fields.string({
+            widget: widgets.hidden()
         })
     })
 }
@@ -80,7 +83,7 @@ const createUserForm = () => {
             label:"Password Again",
             errorAfterField: true,
             validators:[validators.matchField("password")]
-        })
+        }),
     })
 }
 

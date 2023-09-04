@@ -4,6 +4,7 @@ const wax = require("wax-on");
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const flash = require('connect-flash');
+const csurf = require('csurf');
 require("dotenv").config();
 
 // create an instance of express app
@@ -37,6 +38,34 @@ app.use(session({
 
 app.use(flash());
 
+// once csrf is enabled, it will be applied
+// automatically to all POST requests
+// if the post request does not have valid
+// csrf token, it will be rejected
+app.use(csurf());
+
+// how does middlewares handle errors
+// if the middleware prior has an error, it will be forward to the
+// next middleware
+// such a middleware will have four arguments for its function
+// and the first argument will be the err
+app.use(function(err, req, res, next){
+  if (err && err.code == "EBADCSRFTOKEN") {
+    req.flash("error", "The form has expired. Please try again.")
+    res.redirect('back'); // go back to the previous page
+  } else {
+    next();
+  }
+}) 
+
+
+// we want a way to share the token
+app.use(function(req,res,next){
+  // share the csrf token with all hbs
+  res.locals.csrfToken = req.csrfToken();
+  next();
+})
+
 // custom middleware to extract the flash messages
 app.use(function(req,res,next){
   // extract out the success_messages
@@ -60,6 +89,7 @@ app.use(function(req,res,next){
 const landingRoutes = require('./routes/landing');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
+const cloudinaryRoutes = require('./routes/cloudinary')
 
 async function main() {
 
@@ -75,7 +105,11 @@ async function main() {
 
     // regiser the user routes
     app.use('/users', userRoutes);
-}
+
+    // register the cloudinary route
+    app.use('/cloudinary', cloudinaryRoutes);
+
+  }
 
 main();
 
