@@ -38,7 +38,10 @@
                 <div>
                     {{#if user}}
                         Welcome back, <a href="/users/profile">{{user.name}}</a>
-                        <a href="/users/logout" class="btn btn-primary btn-sm">Logout</a>
+                        <a href="/cart" class="btn btn-success btn-sm">Cart</a>
+                        <a href="/users/logout" class="btn btn-danger btn-sm">Logout</a>
+                    {{else}}
+                        <a href="/users/login" class="btn btn-primary btn-sm">Login</a>
                     {{/if}}
                 </div>
             </div>

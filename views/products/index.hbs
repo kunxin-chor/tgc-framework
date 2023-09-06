@@ -36,6 +36,10 @@
             <td>
                 <a href="/products/{{this.id}}/update" class="btn btn-primary btn-sm">Update</a>
                 <a href="/products/{{this.id}}/delete" class="btn btn-danger btn-sm">Delete</a>
+                <form method="POST" action="/cart/{{this.id}}/add">
+                    <input type="hidden" name="_csrf" value="{{../csrfToken}}"/>
+                    <button class="btn btn-success btn-sm">Add to Cart</button>
+                </form>
             </td>
         </tr>
         {{/each}}

@@ -1,19 +1,18 @@
 const express = require('express');
 const { Product, Category, Tag } = require('../models');
 const { createProductForm, bootstrapField, createSearchForm } = require('../forms');
-const async = require('hbs/lib/async');
+const { getAllCategories, getAllTags, getProductByID, createProduct } = require('../dal/products');
 const router = express.Router();
 
 
 router.get('/', async (req, res) => {
 
     // fetch all possible categories from the database
-    const allCategories = await Category.fetchAll().map(c => [c.get('id'), c.get('name')]);
+    const allCategories = await getAllCategories();
     allCategories.unshift([0, '---------']);
 
     // fetch all possible tags from the database
-    const allTags = await Tag.fetchAll().map(t => [t.get('id'), t.get('name')])
-
+    const allTags = await getAllTags();
 
     const searchForm = createSearchForm(allCategories, allTags);
 
@@ -43,7 +42,7 @@ router.get('/', async (req, res) => {
             const products = await q.fetch({
                 withRelated:['category', 'tags']
             })
-           console.log(products.toJSON());
+         
             res.render('products/index',{
                 products: products.toJSON(),
                 searchForm: form.toHTML(bootstrapField)
@@ -85,10 +84,10 @@ router.get('/', async (req, res) => {
 router.get('/add-product', async (req, res) => {
 
     // fetch all possible categories from the database
-    const allCategories = await Category.fetchAll().map(c => [c.get('id'), c.get('name')]);
+    const allCategories = await getAllCategories();
 
     // fetch all possible tags from the database
-    const allTags = await Tag.fetchAll().map(t => [t.get('id'), t.get('name')])
+    const allTags = await getAllTags();
 
     const form = createProductForm(allCategories, allTags);
     res.render('products/create', {
@@ -102,10 +101,10 @@ router.get('/add-product', async (req, res) => {
 router.post('/add-product', async (req, res) => {
 
     // fetch all possible categories from the databasae
-    const allCategories = await Category.fetchAll().map(c => [c.get('id'), c.get('name')]);
+    const allCategories = await getAllCategories();
 
     // fetch all possible tags from the database
-    const allTags = await Tag.fetchAll().map(t => [t.get('id'), t.get('name')])
+    const allTags = await getAllTags();
 
 
     const form = createProductForm(allCategories, allTags);
@@ -120,13 +119,7 @@ router.post('/add-product', async (req, res) => {
 
             // create a new Product model instance
             // (it will refer to a new row)
-            const product = new Product();
-            product.set('name', form.data.name);
-            product.set('cost', form.data.cost);
-            product.set('description', form.data.description);
-            product.set('category_id', form.data.category_id);
-            product.set('image_url', form.data.image_url);
-            await product.save();
+            const product = await createProduct(form.data);
 
             // save to pivot table (AFTER THE PRODUCT HAS BEEN CREATED)
             if (form.data.tags) {
@@ -163,16 +156,11 @@ router.post('/add-product', async (req, res) => {
 
 router.get('/:product_id/update', async (req, res) => {
     // retrieve the product we are editing
-    const productId = req.params.product_id;
-    const product = await Product.where({
-        'id': productId
-    }).fetch({
-        require: true,
-        withRelated: ['tags'] // fetch all the associated tags information
-    });
+   
+    const product = await getProductByID(req.params.product_id);
 
     // fetch all possible categories from the databasae
-    const allCategories = await Category.fetchAll().map(c => [c.get('id'), c.get('name')]);
+    const allCategories = await getAllCategories();
 
     // fetch all possible tags from the database
     const allTags = await Tag.fetchAll().map(t => [t.get('id'), t.get('name')])
@@ -202,14 +190,9 @@ router.get('/:product_id/update', async (req, res) => {
 
 router.post('/:product_id/update', async (req, res) => {
     // fetch all possible categories from the databasae
-    const allCategories = await Category.fetchAll().map(c => [c.get('id'), c.get('name')]);
+    const allCategories = await getAllCategories();
     const form = createProductForm(allCategories);
-    const product = await Product.where({
-        'id': req.params.product_id
-    }).fetch({
-        require: true,
-        withRelated: ['tags']
-    });
+    const product = await getProductByID(req.params.product_id);
 
     form.handle(req, {
         'success': async (form) => {
@@ -255,12 +238,7 @@ router.post('/:product_id/update', async (req, res) => {
 
 router.get('/:product_id/delete', async (req, res) => {
     const productId = req.params.product_id;
-    const product = await Product.where({
-        'id': productId
-    }).fetch({
-        require: true
-    });
-
+    const product = await getProductByID(productId);
     res.render('products/delete', {
         product: product.toJSON()
     })

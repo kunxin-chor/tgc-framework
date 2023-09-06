@@ -1,0 +1,22 @@
+{{#extends "base"}}
+
+{{#block "content"}}
+<h1>Shopping Cart</h1>
+<div class="list-group">
+    {{#each allCartItems}}
+    <div class="list-group-item">
+        <img src="{{this.product.image_url}}" class="img-fluid"/>
+        <h3>{{this.product.name}}</h3>
+        <div>
+            {{this.product.description}}
+        </div>
+        <ul>
+            <li>Price: {{this.product.cost}}</li>
+            <li>Quantity: {{this.quantity}}</li>
+        </ul>
+    </div>
+    {{/each}}
+</div.
+{{/block}}
+
+{{/extends}}
