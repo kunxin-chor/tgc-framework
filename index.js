@@ -31,7 +31,7 @@ app.use(
 // setup sessions
 app.use(session({
   store: new FileStore(), // use files to store sessions
-  secret:"keyboard cat",
+  secret:process.env.SESSION_SECRET_KEY,
   resave: false,
   saveUninitialized: true // create a session if the request does not have one
 }));
