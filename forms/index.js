@@ -65,6 +65,42 @@ const createProductForm = (categories=[], tags=[]) => {
     })
 }
 
+
+const createSearchForm = (categories=[], tags=[]) => {
+    // creates a form object
+    // the key will the value of the `name` attribute
+    return forms.create({
+        'name': fields.string({
+            required: false,
+            errorAfterField: true,
+        }),
+        'max_cost':fields.number({
+            required: false,
+            errorAfterField: true,
+            validators:[validators.min(1), validators.integer()]
+        }),
+        'min_cost':fields.number({
+            required: false,
+            errorAfterField: true,
+            validators:[validators.min(1), validators.integer()]
+        }),
+        'category_id': fields.string({
+            label: 'Category',
+            required: false,
+            errorAfterField: true,
+            widget: widgets.select(),
+            choices:categories
+        }),
+        'tags': fields.string({
+            label:'Tags',
+            required: false,
+            errorAfterField: true,
+            widget: widgets.multipleSelect(),
+            choices: tags
+        })
+    })
+}
+
 const createUserForm = () => {
     return forms.create({
         'name': fields.string({
@@ -104,5 +140,6 @@ module.exports = {
     bootstrapField,
     createProductForm,
     createUserForm,
-    createLoginForm
+    createLoginForm,
+    createSearchForm
 }

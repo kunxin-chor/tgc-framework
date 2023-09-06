@@ -3,6 +3,10 @@
 {{#block "content"}}
 <h1>All Products</h1>
 
+<form>
+    {{{searchForm}}}
+    <button class="mt-3 class-btn btn-primary btn-sm">Search</button>
+</form>
 
 <table class="table">
     <thead>
@@ -11,6 +15,7 @@
             <th>Name</th>
             <th>Cost</th>
             <th>Category</th>
+            <th>Tags</th>
             <th>Image</th>
             <th></th>
         </tr>
@@ -22,6 +27,11 @@
             <td>{{this.name}}</td>
             <td>{{this.cost}}</td>
             <td>{{this.category.name}}</td>
+            <td>    
+                {{#each this.tags}}
+                <span class="badge bg-primary">{{this.name}}</span>
+                {{/each}}
+            </td>
             <td><img src="{{this.image_url}}" class="img-fluid"/></td>
             <td>
                 <a href="/products/{{this.id}}/update" class="btn btn-primary btn-sm">Update</a>
