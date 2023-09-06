@@ -18,4 +18,12 @@ const addToCart = async (userId, productId, quantity) => {
     }
 }
 
-module.exports = {addToCart, getCart};
+const updateCartItemQuantity = async (userId, productId, newQuantity) => {
+    await cartDataLayer.updateQuantity(cartItem=null, userId=userId, productId=productId, newQuantity=newQuantity);
+}
+
+const removeFromCart = async(userId, productId) => {
+    await cartDataLayer.removeFromCart(userId, productId);
+}
+
+module.exports = {addToCart, getCart, updateCartItemQuantity, removeFromCart};

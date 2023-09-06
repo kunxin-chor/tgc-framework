@@ -1,11 +1,11 @@
-const {CartItem} = require('../models')
+const { CartItem } = require('../models')
 
-const getCart = async(userId) => {
+const getCart = async (userId) => {
     return await CartItem.collection()
-        .where({'user_id': userId})
+        .where({ 'user_id': userId })
         .fetch({
-            'require':false,
-            'withRelated':['product', 'product.category']
+            'require': false,
+            'withRelated': ['product', 'product.category']
         })
 
 }
@@ -29,13 +29,13 @@ const getCartItemByUserAndProduct = async (userId, productId) => {
     })
 }
 
-const updateQuantity = async (cartItem=null, userId=null, productId=null, newQuantity=null) => {
-   
+const updateQuantity = async (cartItem = null, userId = null, productId = null, newQuantity = null) => {
+
 
     if (!cartItem) {
         cartItem = await getCartItemByUserAndProduct(userId, productId);
     }
-    
+
     if (cartItem) {
         console.log("new quantity=", newQuantity);
         // if cartItem exists, then just update the cart item
@@ -45,6 +45,12 @@ const updateQuantity = async (cartItem=null, userId=null, productId=null, newQua
 
 }
 
+const removeFromCart = async (userId, productId) => {
+    const cartItem = await getCartItemByUserAndProduct(userId, productId);
+    await cartItem.destroy();
+
+}
+
 module.exports = {
-    getCart, createCartItem, getCartItemByUserAndProduct, updateQuantity, getCart
+    getCart, createCartItem, getCartItemByUserAndProduct, updateQuantity, getCart, removeFromCart
 }

@@ -5,18 +5,38 @@
 <div class="list-group">
     {{#each allCartItems}}
     <div class="list-group-item">
-        <img src="{{this.product.image_url}}" class="img-fluid"/>
+        <img src="{{this.product.image_url}}" class="img-fluid" />
         <h3>{{this.product.name}}</h3>
         <div>
             {{this.product.description}}
         </div>
         <ul>
             <li>Price: {{this.product.cost}}</li>
-            <li>Quantity: {{this.quantity}}</li>
+            <li>Quantity:
+
+                <form method="POST"
+                    action="/cart/{{this.product.id}}/updateQuantity">
+                    <input style="width:2em;" type="number"
+                        value="{{this.quantity}}" name="newQuantity" />
+                    <button class="btn btn-primary btn-sm">Update
+                        Quantity</button>
+                    <input type="hidden" value="{{../csrfToken}}"
+                        name="_csrf" />
+                </form>
+
+            </li>
+            <form method="POST" action="/cart/{{this.product.id}}/delete">
+                <a href="#" class="btn btn-danger btn-sm" onclick="
+                    console.log('clicked');
+                    event.preventDefault();
+                    event.target.parentNode.submit();
+                ">Delete</a>
+                <input type="hidden" value="{{../csrfToken}}" name="_csrf" />
+            </form>
+
+            </form>
         </ul>
     </div>
     {{/each}}
-</div.
-{{/block}}
-
-{{/extends}}
+</div>
+{{/block}} {{/extends}}
