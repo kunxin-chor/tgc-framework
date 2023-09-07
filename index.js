@@ -113,6 +113,9 @@ async function main() {
     // register the shopping cart routes
     app.use('/cart', cartRoutes);
 
+    // register the checkout routes
+    app.use('/checkout', require('./routes/checkout'));
+
   }
 
 main();

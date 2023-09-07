@@ -1,6 +1,11 @@
 const cartDataLayer = require('../dal/cart_items')
 
 const getCart = async(userId) =>{
+
+    if (!userId) {
+        throw "UserId must be provided";
+    }
+
     return await cartDataLayer.getCart(userId);
 }
 
