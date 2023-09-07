@@ -42,7 +42,17 @@ app.use(flash());
 // automatically to all POST requests
 // if the post request does not have valid
 // csrf token, it will be rejected
-app.use(csurf());
+const csrfInstance = csurf();
+
+// use a proxy middleware to check if to apply csrf to the requested route
+app.use(function(req,res,next){
+  if (req.url === "/checkout/process_payment") {
+    // don't apply csrf
+    return next();
+  }
+  // if not that excluded route, then apply csrf
+  csrfInstance(req,res,next);
+})
 
 // how does middlewares handle errors
 // if the middleware prior has an error, it will be forward to the
@@ -62,7 +72,11 @@ app.use(function(err, req, res, next){
 // we want a way to share the token
 app.use(function(req,res,next){
   // share the csrf token with all hbs
-  res.locals.csrfToken = req.csrfToken();
+
+  if (req.csrfToken) {
+    res.locals.csrfToken = req.csrfToken();
+  }
+ 
   next();
 })
 
