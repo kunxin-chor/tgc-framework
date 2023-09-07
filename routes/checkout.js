@@ -82,6 +82,7 @@ router.post('/process_payment', express.raw({ type: 'application/json' }), async
     if (event.type == "checkout.session.completed") {
         const stripeSession = event.data.object;
         console.log(stripeSession);
+        // TODO: Store the stripe session in your database for vendor management
     }
 
 })

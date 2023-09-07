@@ -46,7 +46,7 @@ const csrfInstance = csurf();
 
 // use a proxy middleware to check if to apply csrf to the requested route
 app.use(function(req,res,next){
-  if (req.url === "/checkout/process_payment") {
+  if (req.url === "/checkout/process_payment" || req.url.slice(0,5)=="/api/") {
     // don't apply csrf
     return next();
   }
@@ -106,9 +106,11 @@ const userRoutes = require('./routes/users');
 const cloudinaryRoutes = require('./routes/cloudinary');
 const cartRoutes = require('./routes/shoppingCart');
 
+const api = {
+  products: require('./routes/api/products')
+}
+
 async function main() {
-
-
     // register the landingRoutes router with express
     // for an URLS that begins with `/` only,
     // then use the landingRoutes router object
@@ -129,6 +131,9 @@ async function main() {
 
     // register the checkout routes
     app.use('/checkout', require('./routes/checkout'));
+
+    // register API routes
+    app.use('/api/products', express.json(), api.products);
 
   }
 
