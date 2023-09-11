@@ -5,17 +5,19 @@ const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const flash = require('connect-flash');
 const csurf = require('csurf');
+const cors = require('cors');
 require("dotenv").config();
 
 // create an instance of express app
 let app = express();
+
+app.use(cors());
 
 // set the view engine
 app.set("view engine", "hbs");
 
 // static folder
 app.use(express.static("public"));
-
 
 // setup wax-on
 wax.on(hbs.handlebars);
@@ -107,7 +109,8 @@ const cloudinaryRoutes = require('./routes/cloudinary');
 const cartRoutes = require('./routes/shoppingCart');
 
 const api = {
-  products: require('./routes/api/products')
+  products: require('./routes/api/products'),
+  users: require('./routes/api/users')
 }
 
 async function main() {
@@ -134,6 +137,7 @@ async function main() {
 
     // register API routes
     app.use('/api/products', express.json(), api.products);
+    app.use('/api/users', express.json(), api.users);
 
   }
 
